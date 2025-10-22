@@ -3,7 +3,6 @@
     <h2>Sales Overview</h2>
 
     <DisplayData v-slot="{ salesData, totalRevenue }">
-      <!-- Summary Cards -->
       <div class="summary-cards">
         <div class="card">
           <h3>Total Revenue</h3>
@@ -15,7 +14,6 @@
         </div>
       </div>
 
-      <!-- Sales Table (Scrollable) -->
       <div class="table-container">
         <h3>Sales Data</h3>
         <div class="table-scroll">
@@ -46,7 +44,6 @@
         </div>
       </div>
 
-      <!-- Placeholder for Chart (we'll add this next) -->
       <div class="chart-container">
         <h3>Sales Trends</h3>
         <p>Chart will go here...</p>

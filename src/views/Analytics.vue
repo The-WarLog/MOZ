@@ -3,20 +3,27 @@
     <h2>Sales Analytics</h2>
 
     <DisplayData v-slot="{ salesData }">
-      <div v-if="salesData.length > 0">
+      <!-- Filters -->
+      <SalesFilters
+        v-model:filters="filters"
+        :available-regions="uniqueRegions(salesData)"
+        :available-products="uniqueProducts(salesData)"
+      />
+
+      <div v-if="filteredData(salesData).length > 0">
         <!-- Top Metrics Row -->
         <div class="metrics-row">
           <div class="metric-card">
             <h3>Avg Order Value</h3>
-            <p class="metric-value">${{ averageOrderValue(salesData).toFixed(2) }}</p>
+            <p class="metric-value">${{ averageOrderValue(filteredData(salesData)).toFixed(2) }}</p>
           </div>
           <div class="metric-card">
             <h3>Total Units Sold</h3>
-            <p class="metric-value">{{ totalQuantity(salesData) }}</p>
+            <p class="metric-value">{{ totalQuantity(filteredData(salesData)) }}</p>
           </div>
           <div class="metric-card">
             <h3>Total Transactions</h3>
-            <p class="metric-value">{{ salesData.length }}</p>
+            <p class="metric-value">{{ filteredData(salesData).length }}</p>
           </div>
         </div>
 
@@ -26,7 +33,11 @@
           <div class="chart-card">
             <h3>Sales by Region</h3>
             <div class="region-stats">
-              <div v-for="region in regionData(salesData)" :key="region.region" class="region-item">
+              <div
+                v-for="region in regionData(filteredData(salesData))"
+                :key="region.region"
+                class="region-item"
+              >
                 <span class="region-name">{{ region.region }}</span>
                 <div class="region-bar-container">
                   <div class="region-bar" :style="{ width: region.percentage + '%' }"></div>
@@ -41,7 +52,7 @@
             <h3>Top 5 Products by Revenue</h3>
             <div class="product-list">
               <div
-                v-for="(product, index) in topProducts(salesData)"
+                v-for="(product, index) in topProducts(filteredData(salesData))"
                 :key="product.name"
                 class="product-item"
               >
@@ -65,20 +76,28 @@
             <canvas ref="timelineCanvas"></canvas>
           </div>
         </div>
-
-        <!-- Initialize chart after render -->
-        <div style="display: none">{{ initChartIfReady(salesData) }}</div>
+      </div>
+      <div v-else class="empty">
+        <p>No data matches the current filters. Try adjusting your selection.</p>
       </div>
     </DisplayData>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, nextTick } from 'vue'
+import { ref, watch, nextTick } from 'vue'
 import DisplayData from '@/components/DisplayData.vue'
+import SalesFilters from '@/components/SalesFilters.vue'
 import { Chart, registerables } from 'chart.js'
 
 Chart.register(...registerables)
+
+interface Filters {
+  regions: string[]
+  products: string[]
+  startDate: string | null
+  endDate: string | null
+}
 
 interface SalesRecord {
   sale_id: number
@@ -91,8 +110,41 @@ interface SalesRecord {
 }
 
 const timelineCanvas = ref<HTMLCanvasElement | null>(null)
-let timelineChart: Chart | null = null
-let chartInitialized = false
+let timelineChart: Chart<'line', number[], string> | null = null
+
+// Filters model
+const filters = ref<Filters>({
+  regions: [],
+  products: [],
+  startDate: null,
+  endDate: null,
+})
+
+// Current filtered data
+const currentFilteredData = ref<SalesRecord[]>([])
+
+// Get unique regions and products
+const uniqueRegions = (sales: SalesRecord[]) => {
+  return Array.from(new Set(sales.map((s) => s.region)))
+}
+
+const uniqueProducts = (sales: SalesRecord[]) => {
+  return Array.from(new Set(sales.map((s) => s.product)))
+}
+
+// Apply filters to data
+const filteredData = (sales: SalesRecord[]) => {
+  const f = filters.value
+  const result = sales.filter((s) => {
+    const regionOk = f.regions.length === 0 || f.regions.includes(s.region)
+    const productOk = f.products.length === 0 || f.products.includes(s.product)
+    const startOk = !f.startDate || s.date >= f.startDate
+    const endOk = !f.endDate || s.date <= f.endDate
+    return regionOk && productOk && startOk && endOk
+  })
+  currentFilteredData.value = result
+  return result
+}
 
 // Calculate average order value
 const averageOrderValue = (sales: SalesRecord[]) => {
@@ -122,7 +174,7 @@ const regionData = (sales: SalesRecord[]) => {
     .map(([region, amount]) => ({
       region,
       total: amount,
-      percentage: (amount / total) * 100,
+      percentage: total > 0 ? (amount / total) * 100 : 0,
     }))
     .sort((a, b) => b.total - a.total)
 }
@@ -160,7 +212,7 @@ const createTimelineChart = (sales: SalesRecord[]) => {
   })
 
   const sortedDates = Object.keys(dateMap).sort()
-  const values = sortedDates.map((date) => dateMap[date])
+  const values = sortedDates.map((date) => dateMap[date] ?? 0)
 
   // Destroy existing chart
   if (timelineChart) {
@@ -196,7 +248,15 @@ const createTimelineChart = (sales: SalesRecord[]) => {
         tooltip: {
           callbacks: {
             label: (context) => {
-              return 'Sales: $' + context.parsed.y.toFixed(2)
+              // context.parsed can be a number or an object with { y }, and it can be null — handle both cases safely
+              const parsed = context.parsed
+              const value =
+                typeof parsed === 'number'
+                  ? parsed
+                  : parsed && typeof parsed.y === 'number'
+                    ? parsed.y
+                    : 0
+              return 'Sales: $' + value.toFixed(2)
             },
           },
         },
@@ -211,19 +271,20 @@ const createTimelineChart = (sales: SalesRecord[]) => {
       },
     },
   })
-
-  chartInitialized = true
 }
 
-// Initialize chart when canvas is ready
-const initChartIfReady = (salesData: SalesRecord[]) => {
-  if (!chartInitialized && salesData.length > 0) {
+// Watch for filter changes and update chart
+watch(
+  [filters, currentFilteredData],
+  () => {
     nextTick(() => {
-      createTimelineChart(salesData)
+      if (currentFilteredData.value.length > 0) {
+        createTimelineChart(currentFilteredData.value)
+      }
     })
-  }
-  return null
-}
+  },
+  { deep: true },
+)
 </script>
 
 <style scoped>
@@ -287,7 +348,6 @@ h2 {
   color: #2c3e50;
 }
 
-/* Region Stats */
 .region-stats {
   display: flex;
   flex-direction: column;
@@ -325,7 +385,6 @@ h2 {
   color: #3498db;
 }
 
-/* Product List */
 .product-list {
   display: flex;
   flex-direction: column;
@@ -383,7 +442,6 @@ h2 {
   color: #27ae60;
 }
 
-/* Timeline Chart */
 .timeline-chart {
   height: 300px;
   position: relative;
@@ -391,5 +449,18 @@ h2 {
 
 .timeline-chart canvas {
   max-height: 300px;
+}
+
+.empty {
+  text-align: center;
+  padding: 3rem;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.empty p {
+  color: #7f8c8d;
+  font-size: 1.1rem;
 }
 </style>
