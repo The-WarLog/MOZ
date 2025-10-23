@@ -1,10 +1,7 @@
-# leap.toml
+# ...existing code...
+build_command = "npm ci && npm run build"
+run_command = "npm run preview"
+publish_dir = "dist"
 
-# Define build settings if needed (adapt command/directory if necessary)
-build_command = "npm run build"
-run_command = "npm run dev"
-publish_dir = "dist" # Make sure this matches your Vite output directory
-
-# Define routes - this handles the SPA rewrite
 [routes]
 "/*" = "/index.html"

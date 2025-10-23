@@ -108,41 +108,45 @@ function clearFilters() {
 <style scoped>
 .filters-container {
   background: white;
-  padding: 1.5rem;
+  padding: 1rem;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .filters-container h3 {
   margin: 0 0 1rem 0;
   color: #2c3e50;
-  font-size: 1.1rem;
+  font-size: 1rem;
 }
 
 .filters {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
 }
 
 .filter-group {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 0.5rem;
+  min-width: 0;
 }
 
 .filter-group > label {
   font-weight: 600;
   color: #34495e;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
 }
 
 .checkbox-group {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
-  max-height: 150px;
+  gap: 0.4rem;
+  max-height: 120px;
   overflow-y: auto;
   padding: 0.5rem;
   border: 1px solid #ecf0f1;
@@ -153,9 +157,9 @@ function clearFilters() {
 .checkbox-label {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.4rem;
   cursor: pointer;
-  padding: 0.25rem;
+  padding: 0.2rem;
   border-radius: 4px;
   transition: background 0.2s;
 }
@@ -168,17 +172,18 @@ function clearFilters() {
   cursor: pointer;
   width: 16px;
   height: 16px;
+  flex-shrink: 0;
 }
 
 .checkbox-label span {
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   color: #2c3e50;
 }
 
 .date-inputs {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 0.6rem;
 }
 
 .date-field {
@@ -188,7 +193,7 @@ function clearFilters() {
 }
 
 .small-label {
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   color: #7f8c8d;
 }
 
@@ -196,8 +201,9 @@ input[type='date'] {
   padding: 0.5rem;
   border: 1px solid #dfe6e9;
   border-radius: 6px;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   background: #fafafa;
+  width: 100%;
 }
 
 .filter-actions {
@@ -206,7 +212,7 @@ input[type='date'] {
 }
 
 .btn-clear {
-  padding: 0.6rem 1.2rem;
+  padding: 0.5rem 1rem;
   background: #e74c3c;
   color: white;
   border: none;
@@ -214,9 +220,45 @@ input[type='date'] {
   cursor: pointer;
   font-weight: 600;
   transition: background 0.2s;
+  font-size: 0.85rem;
+  white-space: nowrap;
 }
 
 .btn-clear:hover {
   background: #c0392b;
+}
+
+/* Mobile adjustments */
+@media (max-width: 768px) {
+  .filters-container {
+    padding: 0.75rem;
+  }
+
+  .filters {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  .checkbox-group {
+    max-height: 100px;
+  }
+
+  .btn-clear {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .filters-container h3 {
+    font-size: 0.9rem;
+  }
+
+  .filter-group > label {
+    font-size: 0.8rem;
+  }
+
+  .checkbox-label span {
+    font-size: 0.8rem;
+  }
 }
 </style>

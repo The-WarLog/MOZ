@@ -329,94 +329,131 @@ const exportRegionPDF = async (region: string) => {
 <style scoped>
 .reports {
   padding: 1rem;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
+
 h2 {
-  margin-bottom: 1.2rem;
+  margin-bottom: 1rem;
   color: #2c3e50;
+  font-size: 1.5rem;
 }
 
 .summary-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   gap: 1rem;
   margin-bottom: 1.25rem;
 }
+
 .summary-card {
   background: #fff;
-  padding: 1.2rem;
+  padding: 1rem;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
 }
+
 .summary-card h3 {
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   color: #7f8c8d;
   text-transform: uppercase;
   margin-bottom: 0.4rem;
 }
+
 .summary-card .value {
-  font-size: 1.7rem;
+  font-size: 1.5rem;
   font-weight: 700;
   color: #2c3e50;
+  margin: 0;
 }
 
 .regions-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(460px, 1fr));
-  gap: 1.2rem;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 1rem;
 }
+
 .region-card {
   background: #fff;
   padding: 1rem;
-  border-radius: 10px;
+  border-radius: 8px;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
 }
+
 .region-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   margin-bottom: 0.8rem;
+  gap: 0.5rem;
 }
+
 .region-header h3 {
   margin: 0;
   color: #2c3e50;
+  font-size: 1rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
+
 .actions {
   display: flex;
-  gap: 0.5rem;
+  gap: 0.4rem;
+  flex-shrink: 0;
 }
+
 .btn {
-  padding: 0.45rem 0.8rem;
+  padding: 0.4rem 0.7rem;
   border-radius: 6px;
   border: 1px solid #dfe6e9;
   background: #f6f8fa;
   cursor: pointer;
+  font-size: 0.85rem;
+  white-space: nowrap;
 }
+
 .btn:hover {
   background: #eef1f4;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .region-metrics {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 0.6rem;
+  gap: 0.5rem;
   margin-bottom: 0.8rem;
 }
+
 .metric {
   background: #fafafa;
   border: 1px solid #ecf0f1;
   border-radius: 6px;
-  padding: 0.6rem;
+  padding: 0.5rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  min-width: 0;
 }
+
 .metric .label {
   color: #7f8c8d;
-  font-size: 0.85rem;
+  font-size: 0.75rem;
 }
+
 .metric .val {
   font-weight: 700;
   color: #2c3e50;
+  font-size: 0.85rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .region-body {
@@ -424,31 +461,43 @@ h2 {
   grid-template-columns: 1fr 1fr;
   gap: 0.8rem;
 }
+
 .chart-wrap {
-  height: 220px;
+  height: 200px;
+  width: 100%;
 }
+
 .table-wrap {
-  max-height: 220px;
+  max-height: 200px;
   overflow: auto;
   border: 1px solid #ecf0f1;
   border-radius: 6px;
+  -webkit-overflow-scrolling: touch;
 }
+
 table {
   width: 100%;
   border-collapse: collapse;
+  min-width: 400px;
 }
+
 thead {
   position: sticky;
   top: 0;
   background: #34495e;
   color: #fff;
+  z-index: 10;
 }
+
 th,
 td {
-  padding: 0.6rem;
+  padding: 0.5rem;
   border-bottom: 1px solid #ecf0f1;
   text-align: left;
+  white-space: nowrap;
+  font-size: 0.8rem;
 }
+
 tbody tr:hover {
   background: #f8f9fa;
 }
@@ -459,5 +508,94 @@ tbody tr:hover {
   background: #fff;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+}
+
+/* Mobile adjustments */
+@media (max-width: 768px) {
+  .reports {
+    padding: 0.75rem;
+  }
+
+  h2 {
+    font-size: 1.25rem;
+  }
+
+  .summary-grid {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  .regions-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .region-card {
+    padding: 0.75rem;
+  }
+
+  .region-header h3 {
+    font-size: 0.9rem;
+  }
+
+  .btn {
+    padding: 0.35rem 0.6rem;
+    font-size: 0.75rem;
+  }
+
+  .region-metrics {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+
+  .region-body {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  .chart-wrap {
+    height: 180px;
+  }
+
+  .table-wrap {
+    max-height: 180px;
+  }
+}
+
+@media (max-width: 480px) {
+  .reports {
+    padding: 0.5rem;
+  }
+
+  h2 {
+    font-size: 1.1rem;
+  }
+
+  .summary-card .value {
+    font-size: 1.3rem;
+  }
+
+  .region-header h3 {
+    font-size: 0.85rem;
+  }
+
+  .btn {
+    padding: 0.3rem 0.5rem;
+    font-size: 0.7rem;
+  }
+
+  .metric .label,
+  .metric .val {
+    font-size: 0.7rem;
+  }
+
+  .chart-wrap {
+    height: 160px;
+  }
+
+  th,
+  td {
+    padding: 0.4rem;
+    font-size: 0.75rem;
+  }
 }
 </style>

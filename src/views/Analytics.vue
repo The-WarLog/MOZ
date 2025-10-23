@@ -296,85 +296,93 @@ watch(
 <style scoped>
 .analytics {
   padding: 1rem;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 h2 {
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
   color: #2c3e50;
+  font-size: 1.5rem;
 }
 
 .metrics-row {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   gap: 1rem;
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
 }
 
 .metric-card {
   background: white;
-  padding: 1.5rem;
+  padding: 1.25rem;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .metric-card h3 {
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   color: #7f8c8d;
   text-transform: uppercase;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.4rem;
 }
 
 .metric-value {
-  font-size: 1.8rem;
+  font-size: 1.6rem;
   font-weight: bold;
   color: #2c3e50;
+  margin: 0;
 }
 
 .charts-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-  gap: 1.5rem;
-  margin-bottom: 2rem;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
 }
 
 .chart-card {
   background: white;
-  padding: 1.5rem;
+  padding: 1rem;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
 }
 
 .chart-card.full-width {
   grid-column: 1 / -1;
-  min-height: 400px;
+  min-height: 350px;
 }
 
 .chart-card h3 {
-  margin-bottom: 1rem;
+  margin: 0 0 1rem 0;
   color: #2c3e50;
+  font-size: 1rem;
 }
 
 .region-stats {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 0.8rem;
 }
 
 .region-item {
   display: grid;
-  grid-template-columns: 80px 1fr 100px;
+  grid-template-columns: 70px 1fr 90px;
   align-items: center;
-  gap: 1rem;
+  gap: 0.75rem;
 }
 
 .region-name {
   font-weight: 600;
   color: #2c3e50;
+  font-size: 0.85rem;
 }
 
 .region-bar-container {
   background: #ecf0f1;
-  height: 24px;
+  height: 20px;
   border-radius: 4px;
   overflow: hidden;
 }
@@ -389,24 +397,25 @@ h2 {
   text-align: right;
   font-weight: 600;
   color: #3498db;
+  font-size: 0.85rem;
 }
 
 .product-list {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 0.8rem;
 }
 
 .product-item {
   display: grid;
-  grid-template-columns: 30px 1fr 100px;
+  grid-template-columns: 28px 1fr 90px;
   align-items: center;
-  gap: 1rem;
+  gap: 0.75rem;
 }
 
 .product-rank {
-  width: 30px;
-  height: 30px;
+  width: 28px;
+  height: 28px;
   background: #3498db;
   color: white;
   border-radius: 50%;
@@ -414,24 +423,29 @@ h2 {
   align-items: center;
   justify-content: center;
   font-weight: bold;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
+  flex-shrink: 0;
 }
 
 .product-details {
   display: flex;
   flex-direction: column;
   gap: 0.3rem;
+  min-width: 0;
 }
 
 .product-name {
   font-weight: 600;
   color: #2c3e50;
-  font-size: 0.95rem;
+  font-size: 0.85rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .product-bar-container {
   background: #ecf0f1;
-  height: 20px;
+  height: 16px;
   border-radius: 4px;
   overflow: hidden;
 }
@@ -446,20 +460,23 @@ h2 {
   text-align: right;
   font-weight: 600;
   color: #27ae60;
+  font-size: 0.85rem;
 }
 
 .timeline-chart {
-  height: 300px;
+  height: 280px;
   position: relative;
+  width: 100%;
 }
 
 .timeline-chart canvas {
-  max-height: 300px;
+  max-width: 100%;
+  max-height: 280px;
 }
 
 .empty {
   text-align: center;
-  padding: 3rem;
+  padding: 2rem;
   background: white;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -467,6 +484,97 @@ h2 {
 
 .empty p {
   color: #7f8c8d;
-  font-size: 1.1rem;
+  font-size: 1rem;
+  margin: 0;
+}
+
+/* Mobile adjustments */
+@media (max-width: 768px) {
+  .analytics {
+    padding: 0.75rem;
+  }
+
+  h2 {
+    font-size: 1.25rem;
+  }
+
+  .metrics-row {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  .metric-card {
+    padding: 1rem;
+  }
+
+  .metric-value {
+    font-size: 1.4rem;
+  }
+
+  .charts-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .chart-card {
+    padding: 0.75rem;
+  }
+
+  .region-item {
+    grid-template-columns: 60px 1fr 80px;
+    gap: 0.5rem;
+  }
+
+  .product-item {
+    grid-template-columns: 26px 1fr 80px;
+    gap: 0.5rem;
+  }
+
+  .timeline-chart {
+    height: 240px;
+  }
+}
+
+@media (max-width: 480px) {
+  .analytics {
+    padding: 0.5rem;
+  }
+
+  h2 {
+    font-size: 1.1rem;
+  }
+
+  .metric-card h3 {
+    font-size: 0.75rem;
+  }
+
+  .metric-value {
+    font-size: 1.2rem;
+  }
+
+  .chart-card h3 {
+    font-size: 0.9rem;
+  }
+
+  .region-item {
+    grid-template-columns: 50px 1fr 70px;
+  }
+
+  .region-name,
+  .region-value,
+  .product-name,
+  .product-value {
+    font-size: 0.75rem;
+  }
+
+  .product-rank {
+    width: 24px;
+    height: 24px;
+    font-size: 0.75rem;
+  }
+
+  .timeline-chart {
+    height: 200px;
+  }
 }
 </style>
