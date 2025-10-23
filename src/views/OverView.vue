@@ -2,7 +2,7 @@
   <div class="overview">
     <h2>Sales Overview</h2>
 
-    <DisplayData v-slot="{ salesData, totalRevenue }">
+    <DisplayData v-slot="{ salesData, totalRevenue, formatDate }">
       <div class="summary-cards">
         <div class="card">
           <h3>Total Revenue</h3>
@@ -31,8 +31,9 @@
             </thead>
             <tbody>
               <tr v-for="sale in salesData" :key="sale.sale_id">
-                <td>{{ sale.sale_id }}</td>
-                <td>{{ sale.date }}</td>
+                <td v-if="typeof sale.sale_id == 'string'">{{ +sale.sale_id }}</td>
+                <td v-else>{{ sale.sale_id }}</td>
+                <td>{{ formatDate(sale.date) }}</td>
                 <td>{{ sale.region }}</td>
                 <td>{{ sale.product }}</td>
                 <td>{{ sale.quantity }}</td>
@@ -42,11 +43,6 @@
             </tbody>
           </table>
         </div>
-      </div>
-
-      <div class="chart-container">
-        <h3>Sales Trends</h3>
-        <p>Chart will go here...</p>
       </div>
     </DisplayData>
   </div>

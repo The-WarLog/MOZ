@@ -8,7 +8,8 @@
         <div class="checkbox-group">
           <label v-for="region in availableRegions" :key="region" class="checkbox-label">
             <input type="checkbox" :value="region" v-model="localFilters.regions" />
-            <span>{{ region }}</span>
+            <span v-if="region == undefined">Others</span>
+            <span v-else>{{ region }}</span>
           </label>
         </div>
       </div>

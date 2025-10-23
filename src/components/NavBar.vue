@@ -6,22 +6,16 @@
       </div>
 
       <nav class="nav-links">
-        <a href="/overview">Overview</a>
-        <a href="/analytics">Analytics</a>
-        <a href="/reports">Reports</a>
+        <router-link to="/overview">Overview</router-link>
+        <router-link to="/analytics">Analytics</router-link>
+        <router-link to="/reports">Reports</router-link>
       </nav>
-
-      <div class="actions">
-        <div class="search-bar">
-          <input type="text" placeholder="Search..." />
-        </div>
-      </div>
     </div>
   </header>
 </template>
 
 <script setup lang="ts">
-// Later you can add theme toggle logic here
+// for now no logic here
 </script>
 
 <style scoped>
@@ -40,7 +34,11 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 15rem;
+  gap: 2rem;
+}
+
+.brand {
+  flex-shrink: 0;
 }
 
 .brand h1 {
@@ -49,27 +47,23 @@
   font-size: 1.5rem;
 }
 
+.nav-links {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  justify-content: center;
+}
+
 .nav-links a {
   color: #ecf0f1;
   margin: 0 1rem;
   text-decoration: none;
   font-weight: 500;
+  transition: color 0.3s;
 }
 
-.nav-links a:hover {
+.nav-links a:hover,
+.nav-links a.router-link-active {
   color: #1abc9c;
-}
-
-.actions {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-
-.search-bar input {
-  border: none;
-  border-radius: 5px;
-  outline: none;
-  padding: 0.4rem 0.8rem;
 }
 </style>

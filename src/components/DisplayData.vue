@@ -7,14 +7,28 @@
       <p>Error loading data: {{ error.message }}</p>
     </div>
     <div v-else>
-      <slot :salesData="salesData" :totalRevenue="totalRevenue" :loading="loading"></slot>
+      <slot
+        :salesData="salesData"
+        :totalRevenue="totalRevenue"
+        :loading="loading"
+        :formatDate="formatDate"
+      ></slot>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+//import { time } from 'console'
 import { ref, onMounted, computed } from 'vue'
 //Defining the interface for SalesRecord just like we dfine for mapping the data structure
+
+//defining props if any
+// const prop = defineProps<{
+//   datetime?: {
+//     type: [number | string]
+//     required: true
+//   }
+// }>()
 interface SalesRecord {
   sale_id: number | string
   date: string
@@ -50,6 +64,29 @@ const fetchSalesData = async () => {
   } finally {
     loading.value = false //need a final block to ensure loading is set to false after fetch attempt
   }
+}
+// Utility function to format date values for display if the Date is in Unix timestamp or ISO string format
+function formatDate(value: string | number | Date): string {
+  // If it's already a Date, use it
+  if (value instanceof Date) {
+    return isNaN(value.getTime()) ? String(value) : value.toLocaleDateString()
+  }
+
+  let date: Date
+
+  // If it's numeric , assume epoch
+  const num = Number(value)
+  if (!Number.isNaN(num) && String(value).trim() !== '') {
+    // 10 digits = seconds, 13 digits = milliseconds
+    const ms = String(Math.trunc(num)).length === 10 ? num * 1000 : num
+    date = new Date(ms)
+  } else {
+    // Otherwise treat as a date string (ISO like "2025-01-31")
+    date = new Date(String(value))
+  }
+
+  // If invalid, return original as text; else a friendly date
+  return isNaN(date.getTime()) ? String(value) : date.toLocaleDateString()
 }
 
 //ON mounted lifecycle hook to fetch data when component is mounted for fetching sales data

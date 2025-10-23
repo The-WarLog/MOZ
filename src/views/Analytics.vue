@@ -92,6 +92,8 @@ import { Chart, registerables } from 'chart.js'
 
 Chart.register(...registerables)
 
+defineOptions({ name: 'SalesAnalytics' })
+
 interface Filters {
   regions: string[]
   products: string[]
@@ -100,7 +102,7 @@ interface Filters {
 }
 
 interface SalesRecord {
-  sale_id: number
+  sale_id: number | string
   date: string
   region: string
   product: string
@@ -165,7 +167,11 @@ const regionData = (sales: SalesRecord[]) => {
 
   const regions: Record<string, number> = {}
   sales.forEach((sale) => {
-    regions[sale.region] = (regions[sale.region] || 0) + sale.total_price
+    if (sale.region == undefined) {
+      regions['Others'] = (regions[sale.region] || 0) + sale.total_price
+    } else {
+      regions[sale.region] = (regions[sale.region] || 0) + sale.total_price
+    }
   })
 
   const total = Object.values(regions).reduce((sum, val) => sum + val, 0)
