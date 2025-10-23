@@ -76,6 +76,8 @@
             <canvas ref="timelineCanvas"></canvas>
           </div>
         </div>
+        <!-- Ensure chart syncs after render -->
+        <div style="display: none">{{ onAfterRender(filteredData(salesData)) }}</div>
       </div>
       <div v-else class="empty">
         <p>No data matches the current filters. Try adjusting your selection.</p>
@@ -85,7 +87,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, nextTick } from 'vue'
+import { ref, nextTick } from 'vue'
 import DisplayData from '@/components/DisplayData.vue'
 import SalesFilters from '@/components/SalesFilters.vue'
 import { Chart, registerables } from 'chart.js'
@@ -122,8 +124,10 @@ const filters = ref<Filters>({
   endDate: null,
 })
 
-// Current filtered data
-const currentFilteredData = ref<SalesRecord[]>([])
+// Memoization state for filtered data
+let lastFilterKey = ''
+let lastSalesRef: SalesRecord[] | null = null
+let lastFiltered: SalesRecord[] = []
 
 // Get unique regions and products
 const uniqueRegions = (sales: SalesRecord[]) => {
@@ -134,9 +138,19 @@ const uniqueProducts = (sales: SalesRecord[]) => {
   return Array.from(new Set(sales.map((s) => s.product)))
 }
 
-// Apply filters to data
+// Apply filters to data (memoized to avoid repeated heavy work during template evaluations)
 const filteredData = (sales: SalesRecord[]) => {
   const f = filters.value
+  const key = JSON.stringify([
+    sales === lastSalesRef ? sales.length : sales.length + ':' + (sales[0]?.sale_id ?? ''),
+    [...f.regions].sort(),
+    [...f.products].sort(),
+    f.startDate || '',
+    f.endDate || '',
+  ])
+
+  if (lastSalesRef === sales && lastFilterKey === key) return lastFiltered
+
   const result = sales.filter((s) => {
     const regionOk = f.regions.length === 0 || f.regions.includes(s.region)
     const productOk = f.products.length === 0 || f.products.includes(s.product)
@@ -144,7 +158,10 @@ const filteredData = (sales: SalesRecord[]) => {
     const endOk = !f.endDate || s.date <= f.endDate
     return regionOk && productOk && startOk && endOk
   })
-  currentFilteredData.value = result
+
+  lastSalesRef = sales
+  lastFilterKey = key
+  lastFiltered = result
   return result
 }
 
@@ -207,7 +224,7 @@ const topProducts = (sales: SalesRecord[]) => {
   }))
 }
 
-// Create timeline chart
+// Create or update timeline chart
 const createTimelineChart = (sales: SalesRecord[]) => {
   if (!timelineCanvas.value || !sales || sales.length === 0) return
 
@@ -220,12 +237,14 @@ const createTimelineChart = (sales: SalesRecord[]) => {
   const sortedDates = Object.keys(dateMap).sort()
   const values = sortedDates.map((date) => dateMap[date] ?? 0)
 
-  // Destroy existing chart
+  // If chart exists, update it; otherwise create new
   if (timelineChart) {
-    timelineChart.destroy()
+    timelineChart.data.labels = sortedDates
+    timelineChart.data.datasets[0].data = values
+    timelineChart.update()
+    return
   }
 
-  // Create new chart
   timelineChart = new Chart(timelineCanvas.value, {
     type: 'line',
     data: {
@@ -279,25 +298,25 @@ const createTimelineChart = (sales: SalesRecord[]) => {
   })
 }
 
-// Watch for filter changes and update chart
-watch(
-  [filters, currentFilteredData],
-  () => {
-    nextTick(() => {
-      if (currentFilteredData.value.length > 0) {
-        createTimelineChart(currentFilteredData.value)
-      }
-    })
-  },
-  { deep: true },
-)
+// Debounced sync from template: after each render, update the chart with current rows
+let rafId: number | null = null
+const onAfterRender = (rows: SalesRecord[]) => {
+  if (rafId !== null) cancelAnimationFrame(rafId)
+  rafId = requestAnimationFrame(() => {
+    if (rows && rows.length) {
+      nextTick(() => createTimelineChart(rows))
+    }
+  })
+  return null
+}
 </script>
 
 <style scoped>
 .analytics {
   padding: 1rem;
   width: 100%;
-  max-width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
   box-sizing: border-box;
 }
 
