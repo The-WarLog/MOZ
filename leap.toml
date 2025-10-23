@@ -1,6 +1,4 @@
-# ...existing code...
 build_command = "npm ci && npm run build"
-run_command = "npm run preview"
 publish_dir = "dist"
 
 [routes]
