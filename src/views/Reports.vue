@@ -328,9 +328,10 @@ const exportRegionPDF = async (region: string) => {
 
 <style scoped>
 .reports {
-  padding: 1rem;
+  padding: 1.25rem;
   width: 100%;
-  max-width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
   box-sizing: border-box;
 }
 
@@ -343,7 +344,7 @@ h2 {
 .summary-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 1rem;
+  gap: 1.25rem;
   margin-bottom: 1.25rem;
 }
 
@@ -370,13 +371,13 @@ h2 {
 
 .regions-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+  gap: 1.25rem;
 }
 
 .region-card {
   background: #fff;
-  padding: 1rem;
+  padding: 1.25rem;
   border-radius: 8px;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
   overflow: hidden;
@@ -427,7 +428,7 @@ h2 {
 .region-metrics {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 0.5rem;
+  gap: 0.75rem;
   margin-bottom: 0.8rem;
 }
 
@@ -558,6 +559,27 @@ tbody tr:hover {
 
   .table-wrap {
     max-height: 180px;
+  }
+}
+
+/* Spacious desktop layout */
+@media (min-width: 1200px) {
+  .summary-grid {
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .regions-grid {
+    grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .region-card {
+    padding: 1.5rem;
+  }
+
+  .region-metrics {
+    gap: 1rem;
   }
 }
 
