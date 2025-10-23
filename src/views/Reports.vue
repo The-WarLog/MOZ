@@ -150,10 +150,24 @@ const uniqueRegions = (sales: SalesRecord[]) =>
   Array.from(new Set(sales.map((s) => s.region?.trim() || 'Others')))
 const uniqueProducts = (sales: SalesRecord[]) => Array.from(new Set(sales.map((s) => s.product)))
 
-// Apply filters to data
+// Apply filters to data (memoized to avoid heavy recomputation on each template read)
+let lastFilterKey = ''
+let lastSalesRef: SalesRecord[] | null = null
+let lastFiltered: SalesRecord[] = []
 const filteredData = (sales: SalesRecord[]) => {
   const f = filters.value
-  return sales.filter((s) => {
+  // Build a stable key from filter values and sales array length
+  const key = JSON.stringify([
+    sales === lastSalesRef ? sales.length : sales.length + ':' + (sales[0]?.sale_id ?? ''),
+    [...f.regions].sort(),
+    [...f.products].sort(),
+    f.startDate || '',
+    f.endDate || '',
+  ])
+
+  if (lastSalesRef === sales && lastFilterKey === key) return lastFiltered
+
+  const result = sales.filter((s) => {
     const region = s.region?.trim() || 'Others'
     const regionOk = f.regions.length === 0 || f.regions.includes(region)
     const productOk = f.products.length === 0 || f.products.includes(s.product)
@@ -161,6 +175,11 @@ const filteredData = (sales: SalesRecord[]) => {
     const endOk = !f.endDate || s.date <= f.endDate
     return regionOk && productOk && startOk && endOk
   })
+
+  lastSalesRef = sales
+  lastFilterKey = key
+  lastFiltered = result
+  return result
 }
 
 // Region helpers
@@ -245,8 +264,10 @@ const redrawRegionCharts = (rows: SalesRecord[]) => {
 }
 
 // Called from template to sync charts when data changes
+let rafId: number | null = null
 const onAfterRender = (rows: SalesRecord[]) => {
-  redrawRegionCharts(rows)
+  if (rafId !== null) cancelAnimationFrame(rafId)
+  rafId = requestAnimationFrame(() => redrawRegionCharts(rows))
   return null
 }
 
