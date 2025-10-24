@@ -166,7 +166,7 @@ framers-dashboard/
 The app currently fetches data from:
 
 ```
-hhttps://68d424b8214be68f8c6887f1.mockapi.io/api/mozilla/tech/web/task/sales
+https://68d424b8214be68f8c6887f1.mockapi.io/api/mozilla/tech/web/task/sales
 ```
 
 To use your own API:
