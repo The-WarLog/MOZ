@@ -178,33 +178,62 @@ const totalQuantity = (sales: SalesRecord[]) => {
   return sales.reduce((sum, sale) => sum + sale.quantity, 0)
 }
 
-// Group sales by region
-const regionData = (sales: SalesRecord[]) => {
+// Type definitions for computed results
+interface RegionDataItem {
+  region: string
+  total: number
+  percentage: number
+}
+
+interface TopProductItem {
+  name: string
+  revenue: number
+  percentage: number
+}
+
+// Memoization cache for regionData
+let regionDataCache: { sales: SalesRecord[]; result: RegionDataItem[] } | null = null
+
+// Group sales by region (memoized)
+const regionData = (sales: SalesRecord[]): RegionDataItem[] => {
   if (!sales || sales.length === 0) return []
+
+  // Return cached result if sales array hasn't changed
+  if (regionDataCache && regionDataCache.sales === sales) {
+    return regionDataCache.result
+  }
 
   const regions: Record<string, number> = {}
   sales.forEach((sale) => {
-    if (sale.region == undefined) {
-      regions['Others'] = (regions[sale.region] || 0) + sale.total_price
-    } else {
-      regions[sale.region] = (regions[sale.region] || 0) + sale.total_price
-    }
+    const region = sale.region ?? 'Others'
+    regions[region] = (regions[region] || 0) + sale.total_price
   })
 
   const total = Object.values(regions).reduce((sum, val) => sum + val, 0)
 
-  return Object.entries(regions)
+  const result = Object.entries(regions)
     .map(([region, amount]) => ({
       region,
       total: amount,
       percentage: total > 0 ? (amount / total) * 100 : 0,
     }))
     .sort((a, b) => b.total - a.total)
+
+  regionDataCache = { sales, result }
+  return result
 }
 
-// Get top 5 products by revenue
-const topProducts = (sales: SalesRecord[]) => {
+// Memoization cache for topProducts
+let topProductsCache: { sales: SalesRecord[]; result: TopProductItem[] } | null = null
+
+// Get top 5 products by revenue (memoized)
+const topProducts = (sales: SalesRecord[]): TopProductItem[] => {
   if (!sales || sales.length === 0) return []
+
+  // Return cached result if sales array hasn't changed
+  if (topProductsCache && topProductsCache.sales === sales) {
+    return topProductsCache.result
+  }
 
   const products: Record<string, number> = {}
   sales.forEach((sale) => {
@@ -217,11 +246,14 @@ const topProducts = (sales: SalesRecord[]) => {
 
   const maxRevenue = sortedProducts[0]?.[1] || 1
 
-  return sortedProducts.map(([name, revenue]) => ({
+  const result = sortedProducts.map(([name, revenue]) => ({
     name,
     revenue,
     percentage: (revenue / maxRevenue) * 100,
   }))
+
+  topProductsCache = { sales, result }
+  return result
 }
 
 // Create or update timeline chart
@@ -240,15 +272,12 @@ const createTimelineChart = (sales: SalesRecord[]) => {
   // If chart exists, update it; otherwise create new
   if (timelineChart) {
     timelineChart.data.labels = sortedDates
-    // Safely update the first dataset's data if it exists, otherwise create a fallback dataset
-    if (
-      Array.isArray(timelineChart.data.datasets) &&
-      timelineChart.data.datasets.length > 0 &&
-      timelineChart.data.datasets[0]
-    ) {
-      timelineChart.data.datasets[0].data = values
+    const dataset = timelineChart.data.datasets[0]
+    if (dataset) {
+      dataset.data = values
+      timelineChart.update('none') // Use 'none' mode to skip animation and improve performance
     } else {
-      // Ensure the datasets array contains at least one dataset so Chart.js can render/update correctly
+      // Fallback: recreate datasets if missing
       timelineChart.data.datasets = [
         {
           label: 'Daily Sales ($)',
@@ -260,9 +289,9 @@ const createTimelineChart = (sales: SalesRecord[]) => {
           pointRadius: 4,
           pointHoverRadius: 6,
         },
-      ] as any
+      ]
+      timelineChart.update('none')
     }
-    timelineChart.update()
     return
   }
 
