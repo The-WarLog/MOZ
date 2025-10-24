@@ -234,10 +234,5 @@ Test it by resizing your browser window or opening on your phone.
 
 - **Fix**: Check browser console (F12) for errors
 - Make sure data is loading (check Network tab)
-- Verify Chart.js is installed: `npm list chart.js`
+- Verify Chart.js is installed: `npm list chart.js` or just install it with `npm i chart.js`
 
-### 404 Errors on Deployed Site
-
-**Problem**: Direct links like `/analytics` show 404
-
-- **Fix**: Make sure `public/_redirects` exists and contains `/* /index.html 200`
