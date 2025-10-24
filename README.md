@@ -223,7 +223,7 @@ Test it by resizing your browser window or opening on your phone.
 
 ### Filters Freeze or Hang
 
-**Problem**: Clicking checkboxes might make the page unresponsive on verecel deployed link
+**Problem**: Clicking checkboxes might make the page unresponsive on vercel deployed link
 
 - **Fix**: This was fixed with memoization (caching),although
 - But If its still happening, try filtering fewer items at once or just run the site locally on localhost there won't we any issues.
