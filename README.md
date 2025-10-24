@@ -38,8 +38,7 @@ This dashboard helps you:
 - **Node.js** version 20.19 or higher ([Download here](https://nodejs.org/))
 - **npm** (comes with Node.js)
 - A code editor like [VS Code](https://code.visualstudio.com/)
-
--npm install -g @vue/cli
+- npm install -g @vue/cli
 
 ### Installation Steps
 
