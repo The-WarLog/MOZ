@@ -1,4 +1,4 @@
-# Sales Dashboard - Mozilla Tech Assessment
+# Sales Dashboard - 
 
 A modern, responsive sales analytics dashboard built with Vue 3 and TypeScript. View sales data, analyze trends, filter by region/product/date, and export reports to CSV or PDF.
 
