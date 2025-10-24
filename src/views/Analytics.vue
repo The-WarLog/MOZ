@@ -240,7 +240,28 @@ const createTimelineChart = (sales: SalesRecord[]) => {
   // If chart exists, update it; otherwise create new
   if (timelineChart) {
     timelineChart.data.labels = sortedDates
-    timelineChart.data.datasets[0].data = values
+    // Safely update the first dataset's data if it exists, otherwise create a fallback dataset
+    if (
+      Array.isArray(timelineChart.data.datasets) &&
+      timelineChart.data.datasets.length > 0 &&
+      timelineChart.data.datasets[0]
+    ) {
+      timelineChart.data.datasets[0].data = values
+    } else {
+      // Ensure the datasets array contains at least one dataset so Chart.js can render/update correctly
+      timelineChart.data.datasets = [
+        {
+          label: 'Daily Sales ($)',
+          data: values,
+          borderColor: '#3498db',
+          backgroundColor: 'rgba(52, 152, 219, 0.1)',
+          tension: 0.4,
+          fill: true,
+          pointRadius: 4,
+          pointHoverRadius: 6,
+        },
+      ] as any
+    }
     timelineChart.update()
     return
   }
